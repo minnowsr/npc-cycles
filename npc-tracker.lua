@@ -1,6 +1,6 @@
 --------------------------------------
 -- NPC cycle tracking for DPPt/HGSS --
--- Version 0.1
+-- Version 0.2
 -- Author: minnowsr (github.com/minnowsr/npc-cycles)
 -- Updated: 10/24/2023
 --------------------------------------
@@ -23,6 +23,7 @@ end
 
 function main() 
     game = memory.readdword(0x23FFE0C)
+    offset = 0
 
     if game == 0x45475049 or game == 0x454B5049 then -- hgss
         pointer = memory.readdword(0x0211186C)
@@ -36,9 +37,19 @@ function main()
         pointer = memory.readdword(0x02106FAC)
         offset = 0x31C36
         spacing = 296
+    
     else
-        print("invalid game")
-        return -1
+        game = memory.readbyte(0x02FFFE0E) -- gen 5
+        if game == 0x44 or game == 0x45 then
+            pointer = 0x223C37A 
+            spacing = 0x100
+        elseif game == 0x41 or game == 0x42 then
+            pointer = 0x225237A
+            spacing = 0x100
+        else
+            print("invalid game")
+            return -1
+        end
     end
 
     input_table = input.get()
@@ -69,7 +80,7 @@ function main()
             zero_cycles[i] = 0 
         end
 
-        if zero_cycles[i] <= 30 then
+        if zero_cycles[i] <= 15 then
             -- don't print null memory
             if state == 1 then
                 gui.text(110, active_npcs * 10, "NPC " .. (active_npcs + 1) .. ": " .. tick, "#FFFF00A0")
