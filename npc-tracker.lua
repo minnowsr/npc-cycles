@@ -8,8 +8,7 @@
 -- Press 6 to switch between GUi display modes
 -- Press 7 to reset null tracking
 
--- Sets the number of NPCs addresses to search for. Keep this number above 20.
-local NPC_MAX = 30 
+local NPC_MAX = 100 
 
 local state = 0
 
@@ -40,10 +39,10 @@ function main()
     
     else
         game = memory.readbyte(0x02FFFE0E) -- gen 5
-        if game == 0x44 or game == 0x45 then
+        if game == 0x44 or game == 0x45 then -- bw2
             pointer = 0x223C37A 
             spacing = 0x100
-        elseif game == 0x41 or game == 0x42 then
+        elseif game == 0x41 or game == 0x42 then -- bw1
             pointer = 0x225237A
             spacing = 0x100
         else
