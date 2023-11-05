@@ -1,6 +1,6 @@
 --------------------------------------
 -- NPC cycle tracking for DPPt/HGSS --
--- Version 0.2
+-- Version 0.3
 -- Author: minnowsr (github.com/minnowsr/npc-cycles)
 -- Updated: 10/24/2023
 --------------------------------------
@@ -15,9 +15,12 @@ local state = 0
 local zero_cycles = {}
 local previous_cycles = {}
 
+local framecount = emu.framecount()
+
 function reset_cycles()
     for i=0, NPC_MAX, 1 do
         zero_cycles[i] = 0
+        previous_cycles[i] = 0
     end
 end
 
@@ -74,10 +77,12 @@ function main()
         cycle_addr = pointer + offset + spacing * i
         tick = memory.readword(cycle_addr)
 
-        if tick == previous_cycles[i] or tick >= 63 then
-            zero_cycles[i] = zero_cycles[i] + 1
-        else
-            zero_cycles[i] = 0 
+        if emu.framecount() ~= framecount then
+            if tick == previous_cycles[i] or tick >= 63 then
+               zero_cycles[i] = zero_cycles[i] + 1
+            else
+                zero_cycles[i] = 0 
+            end
         end
 
         if zero_cycles[i] <= 15 then
@@ -91,6 +96,7 @@ function main()
         end
         previous_cycles[i] = tick
     end
+    framecount = emu.framecount()
 
 end
 
