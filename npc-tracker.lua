@@ -85,7 +85,7 @@ function main()
             end
         end
 
-        if zero_cycles[i] <= 15 then
+        if zero_cycles[i] <= 80 then
             -- don't print null memory
             if state == 1 then
                 gui.text(110, active_npcs * 10, "NPC " .. (active_npcs + 1) .. ": " .. tick, "#FFFF00A0")
