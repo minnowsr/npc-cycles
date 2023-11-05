@@ -13,6 +13,7 @@ local NPC_MAX = 100
 local state = 0
 
 local zero_cycles = {}
+local previous_cycles = {}
 
 function reset_cycles()
     for i=0, NPC_MAX, 1 do
@@ -73,7 +74,7 @@ function main()
         cycle_addr = pointer + offset + spacing * i
         tick = memory.readword(cycle_addr)
 
-        if tick == 0 or tick >= 63 then
+        if tick == previous_cycles[i] or tick >= 63 then
             zero_cycles[i] = zero_cycles[i] + 1
         else
             zero_cycles[i] = 0 
@@ -88,6 +89,7 @@ function main()
             end
             active_npcs = active_npcs + 1
         end
+        previous_cycles[i] = tick
     end
 
 end
