@@ -1,19 +1,22 @@
 --------------------------------------
--- NPC cycle tracking for DPPt/HGSS --
--- Version 0.3
+-- NPC cycle tracking for DPPt/HGSS/BW1/BW2 --
+-- Version 0.4
 -- Author: minnowsr (github.com/minnowsr/npc-cycles)
--- Updated: 10/24/2023
+-- Updated: 11/5/2025
 --------------------------------------
+
 
 -- Press 6 to switch between GUi display modes
 -- Press 7 to reset null tracking
 
-local NPC_MAX = 100 
+local NPC_MAX = 100
 
 local state = 0
 
 local zero_cycles = {}
 local previous_cycles = {}
+
+local extra_address = 0
 
 local framecount = emu.framecount()
 
@@ -46,8 +49,9 @@ function main()
         if game == 0x44 or game == 0x45 then -- bw2
             pointer = 0x223C37A 
             spacing = 0x100
+			extra_address = 0x0223E585
         elseif game == 0x41 or game == 0x42 then -- bw1
-            pointer = 0x225237A
+            pointer = 0x225227A
             spacing = 0x100
         else
             print("invalid game")
@@ -75,7 +79,14 @@ function main()
     active_npcs = 0
     for i = 0, NPC_MAX-1, 1 do
         cycle_addr = pointer + offset + spacing * i
-        tick = memory.readword(cycle_addr)
+		
+		tick = memory.readword(cycle_addr)
+
+		-- Village Bridge backpacker hotfix. readbyte is intentional.
+		if i == NPC_MAX-1 and extra_address ~= 0 then
+			cycle_addr = extra_address 
+			tick = memory.readbyte(cycle_addr)
+		end
 
         if emu.framecount() ~= framecount then
             if tick == previous_cycles[i] or tick >= 63 then
@@ -102,3 +113,4 @@ end
 
 reset_cycles()
 gui.register(main)
+
